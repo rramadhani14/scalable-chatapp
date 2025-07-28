@@ -9,6 +9,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import java.time.Duration
 import java.util.UUID
+import java.util.function.Supplier
 
 
 @ApplicationScoped
@@ -24,25 +25,20 @@ class UserPgRepository(private val client: Pool) {
             .subscribe()
     }
 
-    fun getUsers(): List<User> {
+    fun getUsers(): Uni<List<User>> {
         return client
             .preparedQuery("SELECT id, username, password FROM users")
             .execute()
             .onItem()
             .transform { it.map { row -> User(row.getString("id"), row.getString("username"), row.getString("password")) } }
-            .await()
-            .atMost(Duration.ofSeconds(5))
     }
 
-    fun getUser(username: String): User? {
+    fun getUser(username: String): Uni<User?> {
         return client
             .preparedQuery("SELECT id, username, password FROM users WHERE username = $1 LIMIT 1")
             .execute(Tuple.of(username))
             .onItem()
-            .transform { it.map { row -> User(row.getString("id"), row.getString("username"), row.getString("password")) }}
-            .await()
-            .atMost(Duration.ofSeconds(5))
-            .getOrNull(0)
+            .transform { it.map { row -> User(row.getString("id"), row.getString("username"), row.getString("password")) }.firstOrNull()}
     }
 
     fun getUserUni(username: String): Uni<User?> {
@@ -53,27 +49,25 @@ class UserPgRepository(private val client: Pool) {
             .transform { it.map { row -> User(row.getString("id"), row.getString("username"), row.getString("password")) }.getOrNull(0)}
     }
 
-    fun updatePassword(user: User) {
-        client
+    fun updatePassword(user: User): Uni<Any> {
+        return client
             .preparedQuery("UPDATE users SET password = $1 WHERE id = $2")
             .execute(Tuple.of(user.password, user.id))
-            .await()
-            .atMost(Duration.ofSeconds(5))
+            .chain(Supplier { Uni.createFrom().nullItem() })
     }
 
-    fun updateUsername(user: User) {
-        client
+    fun updateUsername(user: User): Uni<Any> {
+        return client
             .preparedQuery("UPDATE users SET username = $2 WHERE id = $1")
             .execute(Tuple.of(user.password, user.id))
-            .await()
-            .atMost(Duration.ofSeconds(5))
+            .chain(Supplier { Uni.createFrom().nullItem() })
     }
 
-    fun saveNewUser(user: User) {
-        client
-            .preparedQuery("INSERT INTO users(id, username, password) VALUES ($1, $2, $3)")
+    fun saveNewUser(user: User): Uni<User> {
+        return client
+            .preparedQuery("INSERT INTO users(id, username, password) VALUES ($1, $2, $3) RETURNING id, username, password")
             .execute(Tuple.of(user.id, user.username, user.password))
-            .await()
-            .atMost(Duration.ofSeconds(5))
+            .onItem()
+            .transform { it.map { row -> User(row.getString("id"), row.getString("username"), "*****") }.first() }
     }
 }

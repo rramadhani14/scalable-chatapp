@@ -12,31 +12,25 @@ import java.util.concurrent.ConcurrentLinkedDeque
 @ApplicationScoped
 class UserService(private val userRepository: UserPgRepository) {
 
-    fun getUsers(): List<User> {
+    fun getUsers(): Uni<List<User>> {
         return userRepository.getUsers()
     }
 
-    fun getUser(username: String): User? {
+    fun getUser(username: String): Uni<User?> {
         return userRepository.getUser(username)
     }
 
-    fun getUserUni(username: String): Uni<User?> {
-        return userRepository.getUserUni(username)
-    }
-
-
-    fun save(userDTO: UserDTO): User {
+    fun save(userDTO: UserDTO): Uni<User> {
         val user = User(id = UUID.randomUUID().toString(), username = userDTO.username, password = BcryptUtil.bcryptHash(userDTO.password, 10))
-        userRepository.saveNewUser(user)
-        return user
+        return userRepository.saveNewUser(user)
     }
 
-    fun updatePassword(user: User) {
-        userRepository.updatePassword(user)
+    fun updatePassword(user: User): Uni<Any> {
+        return userRepository.updatePassword(user)
     }
 
-    fun updateUsername(user: User) {
-        userRepository.updateUsername(user)
+    fun updateUsername(user: User): Uni<Any> {
+        return userRepository.updateUsername(user)
     }
 
 }

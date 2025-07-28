@@ -23,7 +23,7 @@ class UsernamePasswordIdentityProvider(val userService: UserService): IdentityPr
     override fun authenticate(request: UsernamePasswordAuthenticationRequest?, context: AuthenticationRequestContext?): Uni<SecurityIdentity> {
         val username = request?.username ?: ""
         val password = String(request?.password?.password ?: return Uni.createFrom().nullItem())
-        return userService.getUserUni(username)
+        return userService.getUser(username)
             .onItem()
             .transform {
                 if(it != null && BcryptUtil.matches(password, it.password)) {

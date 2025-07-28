@@ -1,5 +1,6 @@
 package dev.ramadhani.room
 
+import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedDeque
@@ -8,34 +9,33 @@ import java.util.concurrent.ConcurrentLinkedDeque
 @ApplicationScoped
 class RoomService(private val roomRepository: RoomPgRepository) {
 
-    fun getRooms(): List<Room> {
+    fun getRooms(): Uni<List<Room>> {
         return roomRepository.getRooms()
     }
 
-    fun getRoom(id: String): Room? {
-        return roomRepository.getRoom(id).getOrNull(0)
+    fun getRoom(id: String): Uni<Room?> {
+        return roomRepository.getRoom(id)
     }
 
-    fun save(room: RoomDTO): Room {
+    fun save(room: RoomDTO): Uni<Room> {
         val id = UUID.randomUUID().toString()
         val room = Room(id, room.name)
-        roomRepository.save(room)
-        return room
+        return roomRepository.save(room)
     }
 
-    fun delete(id: String) {
-        roomRepository.delete(id)
+    fun delete(id: String): Uni<Any> {
+        return roomRepository.delete(id)
     }
 
-    fun joinRoom(userId: String, roomId: String) {
-        roomRepository.joinRoom(userId, roomId)
+    fun joinRoom(userId: String, roomId: String): Uni<Any> {
+        return roomRepository.joinRoom(userId, roomId)
     }
 
-    fun leaveRoom(userId: String, roomId: String) {
-        roomRepository.leaveRoom(userId, roomId)
+    fun leaveRoom(userId: String, roomId: String): Uni<Any> {
+        return roomRepository.leaveRoom(userId, roomId)
     }
 
-    fun getUserRooms(userId: String): List<Room> {
+    fun getUserRooms(userId: String): Uni<List<Room>> {
         return roomRepository.getUserRooms(userId)
     }
 }

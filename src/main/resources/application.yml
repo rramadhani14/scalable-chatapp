@@ -1,3 +1,4 @@
+roomsPerTopicSize: 5
 greeting:
   message: "hello"
 quarkus:
@@ -40,15 +41,15 @@ quarkus:
     username: quarkus_test
     password: quarkus_test
     reactive:
-      url: postgresql://localhost:5432/quarkus_test
+      url: postgresql://localhost:5433/quarkus_test
       max-size: 20
     jdbc:
-      url: jdbc:postgresql://localhost:5432/quarkus_test
+      url: jdbc:postgresql://localhost:5433/quarkus_test
   flyway:
     enabled: true
     password: quarkus_test
     username: quarkus_test
-    jdbc-url: jdbc:postgresql://localhost:5432/quarkus_test
+    jdbc-url: jdbc:postgresql://localhost:5433/quarkus_test
     migrate-at-start: true
     connect-retries: 3
     active: true

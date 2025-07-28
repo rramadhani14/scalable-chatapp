@@ -47,8 +47,13 @@ class DeleteMessageCommand(override val body: ChatMessageDTO): WsChatCommand(bod
 class InitChatCommand(override val body: Any): WsChatCommand(body) {
     override fun execute(connection: WebSocketConnection) {
         val roomService = CDI.current().select(RoomService::class.java).get()
-        val rooms = roomService.getUserRooms(connection.userData().get(UserData.TypedKey.forString("user"))).map { it.id }
-        SubscribeRoomCommand(rooms).execute(connection)
+        roomService.getUserRooms(connection.userData().get(UserData.TypedKey.forString("user")))
+            .onItem()
+            .transform { it.map{ room -> room.id } }
+            .subscribe()
+            .with { rooms ->
+                SubscribeRoomCommand(rooms).execute(connection)
+            }
     }
 }
 

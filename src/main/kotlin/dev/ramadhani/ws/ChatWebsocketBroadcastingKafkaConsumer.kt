@@ -2,6 +2,7 @@ package dev.ramadhani.ws
 
 import dev.ramadhani.chat.ChatMessage
 import dev.ramadhani.chat.ChatMessageKafkaDeserializer
+import dev.ramadhani.util.RoomTopicPartitioner
 import io.quarkus.arc.Unremovable
 import io.quarkus.logging.Log
 import io.smallrye.common.annotation.Identifier
@@ -19,22 +20,12 @@ import java.util.regex.Pattern
 
 @ApplicationScoped
 @Unremovable
-class ChatWebsocketBroadcastingKafkaConsumer(@Identifier("default-kafka-broker") private val config: Map<String, Object>, private val chatWebsocketBroadcastingService: ChatWebsocketBroadcastingService) {
+class ChatWebsocketBroadcastingKafkaConsumer(@Identifier("default-kafka-broker") private val config: Map<String, Object>, private val chatWebsocketBroadcastingService: ChatWebsocketBroadcastingService, private val roomTopicPartitioner: RoomTopicPartitioner) {
     private val currentSubscribedTopic = ConcurrentHashMap<String, Pair<KafkaConsumer<String, ChatMessage>, Future<*>>>()
-    private val kafkaAdminClient = KafkaAdminClient.create(config.toMap())
     private val pollingExecutor = Executors.newFixedThreadPool(4)
 
-    init {
-        Uni.createFrom()
-            .item {
-                kafkaAdminClient.createTopics((0..4).map { NewTopic("chat.message.p-$it", 1, 1) }.toMutableList())
-            }
-            .subscribe()
-    }
-
     fun subscribeRoomTopic(roomId: String) {
-        val partition = roomId.toCharArray().fold(0) { acc, c -> acc + c.code} % 5
-        val topic = "chat.message.p-$partition"
+        val topic = roomTopicPartitioner.getRoomTopic(roomId)
         currentSubscribedTopic.computeIfAbsent(topic) {
             val consumer = KafkaConsumer(config, StringDeserializer(), ChatMessageKafkaDeserializer())
             consumer.subscribe(Pattern.compile(topic))
