@@ -1,0 +1,78 @@
+#roomsPerTopicSize: 5
+greeting:
+  message: "hello"
+quarkus:
+  application:
+    name: chatapp-main
+  package:
+    jar:
+      enabled: true
+  http:
+    port: 8090
+    cors:
+      enabled: false
+      origins: /.*/
+      methods: /.*/
+    auth:
+      form:
+        enabled: true
+        login-page: /login.html
+        post-location: /j_check_security
+        cookie-max-age: 86400
+        cookie-same-site: strict
+        http-only-cookie: true
+        cookie-secure: true
+        error-page:
+        landing-page:
+      session:
+        cookie-secure: true
+        encryption-key: iT7Qk2l2VUPH+9iyZtKUodcsn/Arm7CF0Zw+QDvSIME=
+      permission:
+        public:
+          paths:
+            - /login.html
+            - /favicon.ico
+            - /api/v1/auth/login
+          policy: permit
+        authenticated:
+          paths: /api/*
+          policy: authenticated
+  log:
+    level: DEBUG
+  datasource:
+    db-kind: postgresql
+    username: quarkus_test
+    password: quarkus_test
+    reactive:
+      url: postgresql://localhost:5433/quarkus_test
+      max-size: 20
+    jdbc:
+      url: jdbc:postgresql://localhost:5433/quarkus_test
+  flyway:
+    enabled: true
+    password: quarkus_test
+    username: quarkus_test
+    jdbc-url: jdbc:postgresql://localhost:5433/quarkus_test
+    migrate-at-start: true
+    connect-retries: 3
+    active: true
+    out-of-order: true
+kafka:
+  bootstrap:
+    servers: localhost:9092
+  key:
+    deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    serializer: org.apache.kafka.common.serialization.StringSerializer
+  value:
+    deserializer: io.quarkus.kafka.client.serialization.ObjectMapperDeserializer
+    serializer: io.quarkus.kafka.client.serialization.ObjectMapperSerializer
+
+#mp:
+#  messaging:
+#    incoming:
+#      connector: smallrye-kafka
+
+
+#http-config-source:
+#  api-key:
+#  url:

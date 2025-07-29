@@ -1,0 +1,10 @@
+@use "tailwindcss";
+
+:root {
+    --text-color: oklch(.205 0 0);
+}
+
+body {
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+}
