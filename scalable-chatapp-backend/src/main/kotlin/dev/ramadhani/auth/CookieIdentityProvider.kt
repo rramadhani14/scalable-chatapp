@@ -17,10 +17,15 @@ class CookieIdentityProvider: IdentityProvider<TrustedAuthenticationRequest> {
         request: TrustedAuthenticationRequest?,
         context: AuthenticationRequestContext?
     ): Uni<SecurityIdentity> {
-        val identity = QuarkusSecurityIdentity.builder()
-            .setPrincipal { request?.principal }
-            .addRoles(setOf("USER"))
-            .build()
-        return Uni.createFrom().item(identity)
+        val cookiePrincipal = request?.principal?.split(":")
+        if(cookiePrincipal != null && cookiePrincipal.size == 2) {
+            val principal = UserPrincipalDTO(cookiePrincipal[0], cookiePrincipal[1])
+            val identity = QuarkusSecurityIdentity.builder()
+                .setPrincipal(principal)
+                .addRoles(setOf("USER"))
+                .build()
+            return Uni.createFrom().item(identity)
+        }
+        return Uni.createFrom().nullItem()
     }
 }

@@ -1,21 +1,26 @@
 package dev.ramadhani.user
 
 import io.quarkus.elytron.security.common.BcryptUtil
+import io.quarkus.logging.Log
 import io.quarkus.runtime.StartupEvent
 import io.smallrye.mutiny.Uni
 import io.vertx.mutiny.sqlclient.Pool
 import io.vertx.mutiny.sqlclient.Tuple
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
+import jakarta.inject.Inject
 import java.time.Duration
 import java.util.UUID
+import java.util.concurrent.Executors
+import java.util.function.Consumer
 import java.util.function.Supplier
 
 
 @ApplicationScoped
-class UserPgRepository(private val client: Pool) {
-
+class UserPgRepository (private val client: Pool) {
+    val executor = Executors.newSingleThreadExecutor()
     fun initUsers(@Observes ev: StartupEvent) {
+        Log.info("Starting user PgRepository $ev")
         client
             .preparedQuery("INSERT INTO users(id, username, password) VALUES ($1, $2, $3) ON CONFLICT (username) DO NOTHING")
             .executeBatch(listOf(
@@ -23,6 +28,10 @@ class UserPgRepository(private val client: Pool) {
                 Tuple.of(UUID.randomUUID().toString(), "admin", BcryptUtil.bcryptHash("admin123")),
             ))
             .subscribe()
+            .with(
+                { result -> Log.info("Success: $result") },
+                { err -> Log.error("Failed: $err") }
+            )
     }
 
     fun getUsers(): Uni<List<User>> {

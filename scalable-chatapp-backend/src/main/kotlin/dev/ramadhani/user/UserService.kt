@@ -1,5 +1,6 @@
 package dev.ramadhani.user
 
+import dev.ramadhani.room.RoomService
 import io.quarkus.elytron.security.common.BcryptUtil
 import io.quarkus.runtime.StartupEvent
 import io.smallrye.mutiny.Uni
@@ -10,7 +11,7 @@ import java.util.concurrent.ConcurrentLinkedDeque
 
 
 @ApplicationScoped
-class UserService(private val userRepository: UserPgRepository) {
+class UserService(private val userRepository: UserPgRepository, private val roomService: RoomService) {
 
     fun getUsers(): Uni<List<User>> {
         return userRepository.getUsers()
@@ -31,6 +32,20 @@ class UserService(private val userRepository: UserPgRepository) {
 
     fun updateUsername(user: User): Uni<Any> {
         return userRepository.updateUsername(user)
+    }
+    fun getCurrentUser(username: String): Uni<User?> {
+        return userRepository.getUser(username)
+            .chain { user ->
+                if(user != null) {
+                    return@chain roomService.getUserRooms(user.id)
+                        .onItem()
+                        .transform { rooms ->
+                            User(user.id, user.username, "", rooms)
+                        }
+                }
+                return@chain Uni.createFrom().nullItem<User>()
+            }
+
     }
 
 }

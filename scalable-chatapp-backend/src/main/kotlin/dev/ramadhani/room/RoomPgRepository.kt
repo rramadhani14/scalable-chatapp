@@ -42,19 +42,19 @@ class RoomPgRepository(private val client: Pool) {
     }
 
     fun joinRoom(userId: String, roomId: String): Uni<Any> {
-        return client.preparedQuery("INSERT INTO user_rooms(user_id, room_id) VALUES ($1, $2) ON CONFLICT (user_id, room_id) DO NOTHING")
+        return client.preparedQuery("INSERT INTO user_room(user_id, room_id) VALUES ($1, $2) ON CONFLICT (user_id, room_id) DO NOTHING")
             .execute(Tuple.of(userId, roomId))
             .chain(Supplier { Uni.createFrom().nullItem() })
     }
 
     fun leaveRoom(userId: String, roomId: String): Uni<Any> {
-        return client.preparedQuery("DELETE FROM user_rooms WHERE user_id = $1 AND room_id = $2")
+        return client.preparedQuery("DELETE FROM user_room WHERE user_id = $1 AND room_id = $2")
             .execute(Tuple.of(userId, roomId))
             .chain(Supplier { Uni.createFrom().nullItem() })
     }
 
     fun getUserRooms(userId: String): Uni<List<Room>> {
-        return client.preparedQuery("SELECT room_id FROM user_rooms WHERE user_id = $1")
+        return client.preparedQuery("SELECT room_id FROM user_room WHERE user_id = $1")
             .execute(Tuple.of(userId))
             .onItem()
             .transform { it.map { row -> Room(row.getString("room_id")!!, "")}.toList() }

@@ -5,11 +5,9 @@ import io.smallrye.mutiny.Uni
 import io.vertx.mutiny.sqlclient.Pool
 import io.vertx.mutiny.sqlclient.Tuple
 import jakarta.enterprise.context.ApplicationScoped
-import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
 
-//TODO: Change to suspendable version
 @ApplicationScoped
 class ChatPgRepository(private val client: Pool) {
     fun save(message: ChatMessage): Uni<ChatMessage> {

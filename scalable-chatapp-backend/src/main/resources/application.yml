@@ -10,22 +10,21 @@ quarkus:
   http:
     port: 8090
     cors:
-      enabled: false
-      origins: /.*/
-      methods: /.*/
+      enabled: true
+      access-control-allow-credentials: true
+      origins: http://localhost:4200
+      methods: "*"
     auth:
       form:
         enabled: true
         login-page: /login.html
         post-location: /j_check_security
         cookie-max-age: 86400
-        cookie-same-site: strict
+        cookie-same-site: lax
         http-only-cookie: true
-        cookie-secure: true
-        error-page:
-        landing-page:
+        error-page: ""
+        landing-page: ""
       session:
-        cookie-secure: true
         encryption-key: iT7Qk2l2VUPH+9iyZtKUodcsn/Arm7CF0Zw+QDvSIME=
       permission:
         public:

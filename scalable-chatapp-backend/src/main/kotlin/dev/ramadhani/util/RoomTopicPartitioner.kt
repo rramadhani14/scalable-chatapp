@@ -1,5 +1,6 @@
 package dev.ramadhani.util
 
+import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 import org.apache.kafka.clients.admin.AdminClient
@@ -15,6 +16,10 @@ class RoomTopicPartitioner(@ConfigProperty(name = "roomsPerTopicSize", defaultVa
                 kafkaAdminClient.createTopics((0..roomsPerTopicSize).map { NewTopic("chat.message.bucket-$it", 1, 1) }.toMutableList())
             }
             .subscribe()
+            .with(
+                { result -> Log.info("Topics successfully created: $result") },
+                { ex -> Log.error("Topics failed to be created", ex) }
+            )
     }
 
     fun getRoomTopic(name: String): String {
