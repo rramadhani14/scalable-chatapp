@@ -1,10 +1,26 @@
 @use "tailwindcss";
 
+@theme {
+  --color-primary: #90bedeff;
+  --color-secondary: #90f3ffff;
+  --color-accent: #68edc6ff;
+  --color-background: #e5e1eeff;
+  --color-success: #caffbf;
+  --color-error: #ffadad;
+  --color-info: #dffdffff;
+  --color-text: #333333;
+  --color-text-secondary: #777777;
+}
+
 :root {
-    --text-color: oklch(.205 0 0);
+  --text-color: var(--color-text);
 }
 
 body {
-    color: var(--text-color);
-    font-family: 'Inter', sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  font-family: "Inter", sans-serif;
+}
+*:focus {
+  outline: none;
 }

@@ -1,3 +1,6 @@
 export class LoginDto {
-    constructor(readonly username: string, readonly password: string, readonly csrf: string) {}
+  constructor(
+    readonly username: string,
+    readonly password: string,
+  ) {}
 }

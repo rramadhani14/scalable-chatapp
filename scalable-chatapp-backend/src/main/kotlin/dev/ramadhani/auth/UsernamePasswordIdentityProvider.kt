@@ -10,6 +10,7 @@ import io.quarkus.security.identity.request.UsernamePasswordAuthenticationReques
 import io.quarkus.security.runtime.QuarkusSecurityIdentity
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
+import java.util.UUID
 
 @ApplicationScoped
 class UsernamePasswordIdentityProvider(val userService: UserService): IdentityProvider<UsernamePasswordAuthenticationRequest> {
@@ -28,7 +29,7 @@ class UsernamePasswordIdentityProvider(val userService: UserService): IdentityPr
             .transform {
                 if(it != null && BcryptUtil.matches(password, it.password)) {
                         val identity = QuarkusSecurityIdentity.builder()
-                            .setPrincipal(UserPrincipalDTO(it.id, it.username))
+                            .setPrincipal(UserPrincipalDTO(it.id, it.username, UUID.randomUUID().toString()))
                             .addRoles(setOf("USER"))
                             .build()
                     return@transform identity

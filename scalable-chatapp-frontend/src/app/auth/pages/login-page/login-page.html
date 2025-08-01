@@ -1,9 +1,28 @@
 <div class="flex h-screen">
-    <form action="POST" class="flex flex-col p-4 m-auto rounded-sm border-2 border-gray-400 border-solid gap-2xl min-w-1/3 max-w-2/3 max-h-2/3">
-        <h1>Login</h1>
-        <input class="my-4 py-2 rounded-md min-h-[2rem] pl-2 border-solid border-1  border-gray-400" id="username">
-        <input class="my-4 py-2 rounded-md min-h-[2rem] pl-2 border-solid border-1 border-gray-400" id="password">
-        <a class="text-right" href="/reset-password">forgot password?</a>
-        <button id="submit" class="my-2 py-2 justify-self-end rounded-lg bg-slate-400" type="submit" (click)="submit($event)">Submit</button>
-    </form>
+  <form
+    action="POST"
+    class="flex flex-col p-4 m-auto rounded-xl bg-background gap-2xl min-w-1/3 max-w-2/3 max-h-2/3"
+    [formGroup]="loginForm"
+  >
+    <h1>Login</h1>
+    <input
+      class="my-4 py-2 rounded-md min-h-[2rem] bg-white pl-2"
+      id="username"
+      formControlName="username"
+    />
+    <input
+      class="my-4 py-2 rounded-md min-h-[2rem] pl-2 bg-white"
+      id="password"
+      formControlName="password"
+    />
+    <a class="text-right" href="/reset-password">forgot password?</a>
+    <button
+      id="submit"
+      class="my-2 py-2 justify-self-end rounded-lg bg-accent"
+      type="submit"
+      (click)="submit($event)"
+    >
+      Submit
+    </button>
+  </form>
 </div>

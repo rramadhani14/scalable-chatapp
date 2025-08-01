@@ -10,6 +10,7 @@ export class AuthService {
   private httpClient = inject(HttpClient);
 
   login(credential: LoginDto) {
+    console.log(credential);
     const loginForm = new FormData();
     loginForm.append("j_username", credential.username);
     loginForm.append("j_password", credential.password);
@@ -30,5 +31,14 @@ export class AuthService {
         catchError((err, caught) => of(false)),
         map((res) => (res === false ? false : true)),
       );
+  }
+
+  getCsrfToken(): Observable<null> {
+    return this.httpClient.get<null>(
+      environment.baseApiUrl + "/api/v1/auth/csrf",
+      {
+        withCredentials: true,
+      },
+    );
   }
 }

@@ -18,8 +18,8 @@ class CookieIdentityProvider: IdentityProvider<TrustedAuthenticationRequest> {
         context: AuthenticationRequestContext?
     ): Uni<SecurityIdentity> {
         val cookiePrincipal = request?.principal?.split(":")
-        if(cookiePrincipal != null && cookiePrincipal.size == 2) {
-            val principal = UserPrincipalDTO(cookiePrincipal[0], cookiePrincipal[1])
+        if(cookiePrincipal != null && cookiePrincipal.size == 3) {
+            val principal = UserPrincipalDTO(cookiePrincipal[0], cookiePrincipal[1], cookiePrincipal[2])
             val identity = QuarkusSecurityIdentity.builder()
                 .setPrincipal(principal)
                 .addRoles(setOf("USER"))

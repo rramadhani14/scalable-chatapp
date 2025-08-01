@@ -13,7 +13,7 @@ import jakarta.ws.rs.core.SecurityContext
 
 @Path("api/v1/auth")
 class AuthController(
-    private val csrfService: CsrfService
+
 ) {
     @Inject
     lateinit var identity: CurrentIdentityAssociation
@@ -24,10 +24,4 @@ class AuthController(
         FormAuthenticationMechanism.logout(identity.identity)
     }
 
-    @GET
-    @Path("/csrf")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun csrf(securityContext: SecurityContext): CsrfToken {
-        return CsrfToken(csrfService.getToken(securityContext.userPrincipal.name))
-    }
 }
